@@ -1,30 +1,70 @@
-library("shiny")   # UI and reactive R expressions
-library("plotly")  # interavtie plot functions
-library("copula")  # copulas
-library("zeallot") # unpacking assignment
+library("shiny")  # UI and reactive R expressions
+#source("utils.R") # helper functions
 
+ui <- fluidPage(
+  # App title ----
+  titlePanel("Visualization of Bivariate Copulas"),
+  
+  # Sidebar layout with input and output definitions ----
+  sidebarLayout(
+    # Sidebar panel for inputs ----
+    sidebarPanel(
+      # Select Copula Family ---
+      selectInput(
+        inputId = "copula.choice", label = "Choose Bivariate Copula Family",
+        choices = c("Clayton’s Copula" = "Clayton",
+                    "Frank’s Copula" = "Frank",
+                    "Frechet Upper Bound Copula" = "upper", 
+                    "Frechet Lower Bound Copula" = "lower", 
+                    "Independence Copula" = "independence", 
+                    "Marshall–Olkin Bivariate Exponential Copula" = "exp", 
+                    "Marshall–Olkin Copula" = "Marshall–Olkin",  
+                    "Normal Copula" = "normal", 
+                    "Pareto Bivariate Copula" = "Pareto", 
+                    "Student's T Copula" = "t"), 
+        selected = "normal"), 
+      # Select Marginal #1 ---
+      selectInput(
+        inputId = "x.marginal", label = "Choose a Continuous Marginal for X",
+        choices = c(        "Beta Distriution" = "beta", 
+                       "Binomial Distribution" = "binom", 
+                         "Cauchy Distribution" = "cauchy", 
+                    "Chi-Squared Distribution" = "chisq", 
+                    "Exponential Distribution" = "exp", 
+                              "F Distribution" = "f", 
+                          "Gamma Distribution" = "gamma", 
+                     "Log-Normal Distribution" = "lnorm", 
+                         "Normal Distribution" = "norm", 
+                    "Student's T Distribution" = "t", 
+                        "Uniform Distribution" = "unif", 
+                        "Weibull Distribution" = "weibull"), 
+        selected = "norm"),  
+      # Select Marginal #2 ---
+      selectInput(
+        inputId = "y.marginal", label = "Choose a Continuous Marginal for Y",
+        choices = c(        "Beta Distriution" = "beta", 
+                       "Binomial Distribution" = "binom", 
+                         "Cauchy Distribution" = "cauchy", 
+                    "Chi-Squared Distribution" = "chisq", 
+                    "Exponential Distribution" = "exp", 
+                              "F Distribution" = "f", 
+                          "Gamma Distribution" = "gamma", 
+                     "Log-Normal Distribution" = "lnorm", 
+                         "Normal Distribution" = "norm", 
+                    "Student's T Distribution" = "t", 
+                        "Uniform Distribution" = "unif", 
+                        "Weibull Distribution" = "weibull"), 
+        selected = "norm")
+    ), 
+    # Main panel for displaying outputs ----
+    mainPanel()
+  )
+)
 
+# Server logic
+server <- function(input, output) {
+  
+}
 
-myCop <- normalCopula(param=c(0.4), dim = 2, dispstr = "un")
-myMvd <- mvdc(copula=myCop, margins=c("gamma", "beta"),
-              paramMargins=list(list(shape=2, scale=1),
-                                list(shape1=2, shape2=2)))
-Z2 <- rMvdc(2000, myMvd)
-colnames(Z2) <- c("x1", "x2")
-psych::pairs.panels(Z2)
-
-u <- dCopula(1000, normalCopula(0.5, dim = 3))
-if(require(scatterplot3d))
-  scatterplot3d(u)
-
-x <- Z2[,1]
-y <- Z2[,2]
-
-subplot(
-  plot_ly(x = x, color = I("black")), 
-  plotly_empty(), 
-  plot_ly(x = x, y = y, color = I("black")), 
-  plot_ly(y = y, color = I("black")),
-  nrows = 2, heights = c(0.2, 0.8), widths = c(0.8, 0.2), 
-  shareX = TRUE, shareY = TRUE, titleX = FALSE, titleY = FALSE
-) %>% layout(showlegend = FALSE)
+# Run the app
+shinyApp(ui, server)
